@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.inspiration.island.mapper.CommentMapper">
+
+    <select id="selectCommentWithUser" resultType="com.inspiration.island.entity.Comment">
+        SELECT
+            c.id,
+            c.inspiration_id AS inspirationId,
+            c.user_id AS userId,
+            c.content,
+            c.create_time AS createTime,
+            u.username
+        FROM comment c
+        LEFT JOIN `user` u ON c.user_id = u.id
+        WHERE c.inspiration_id = #{inspirationId}
+        ORDER BY c.create_time ASC
+    </select>
+
+</mapper>

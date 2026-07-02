@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.inspiration.island.mapper.LikeRecordMapper">
+
+    <update id="updateCancel">
+        UPDATE like_record
+        SET is_cancel = 1
+        WHERE user_id = #{userId} AND inspiration_id = #{inspirationId}
+    </update>
+
+    <select id="selectValid" resultType="com.inspiration.island.entity.LikeRecord">
+        SELECT id, user_id, inspiration_id, create_time, is_cancel
+        FROM like_record
+        WHERE user_id = #{userId} AND inspiration_id = #{inspirationId} AND is_cancel = 0
+    </select>
+
+    <select id="countValidByInspirationId" resultType="int">
+        SELECT COUNT(*) FROM like_record
+        WHERE inspiration_id = #{inspirationId} AND is_cancel = 0
+    </select>
+
+</mapper>

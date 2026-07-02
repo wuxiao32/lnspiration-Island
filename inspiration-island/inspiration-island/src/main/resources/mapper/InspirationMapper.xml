@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.inspiration.island.mapper.InspirationMapper">
+
+    <select id="selectByUserId" resultType="com.inspiration.island.entity.Inspiration">
+        SELECT id, title, content, user_id AS userId, create_time AS createTime
+        FROM inspiration
+        WHERE user_id = #{userId}
+        ORDER BY create_time DESC
+    </select>
+
+    <select id="selectAllWithUser" resultType="com.inspiration.island.entity.Inspiration">
+        SELECT
+            i.id,
+            i.user_id AS userId,
+            i.title,
+            i.content,
+            i.create_time AS createTime,
+            u.username
+        FROM inspiration i
+        LEFT JOIN user u ON i.user_id = u.id
+        WHERE i.is_delete = 0
+        ORDER BY i.create_time DESC
+    </select>
+
+</mapper>
