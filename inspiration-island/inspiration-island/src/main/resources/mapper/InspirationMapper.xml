@@ -5,7 +5,7 @@
     <select id="selectByUserId" resultType="com.inspiration.island.entity.Inspiration">
         SELECT id, title, content, user_id AS userId, create_time AS createTime
         FROM inspiration
-        WHERE user_id = #{userId}
+        WHERE user_id = #{userId} AND (is_delete IS NULL OR is_delete = 0)
         ORDER BY create_time DESC
     </select>
 

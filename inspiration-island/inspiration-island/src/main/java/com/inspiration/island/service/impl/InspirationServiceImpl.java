@@ -9,6 +9,7 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 @Service
 public class InspirationServiceImpl extends ServiceImpl<InspirationMapper, Inspiration> implements InspirationService {
@@ -18,16 +19,18 @@ public class InspirationServiceImpl extends ServiceImpl<InspirationMapper, Inspi
 
     @Override
     public List<Inspiration> listAll() {
-        redisTemplate.delete("hot:inspiration:all");
         String cacheKey = "hot:inspiration:all";
+        // 1. 先查 Redis 缓存
         Object cacheData = redisTemplate.opsForValue().get(cacheKey);
         if (cacheData != null) {
             @SuppressWarnings("unchecked")
             List<Inspiration> cached = (List<Inspiration>) cacheData;
             return cached;
         }
+        // 2. 缓存未命中 → 查 MySQL
         List<Inspiration> list = baseMapper.selectAllWithUser();
-        redisTemplate.opsForValue().set(cacheKey, list);
+        // 3. 写入 Redis，30 分钟过期
+        redisTemplate.opsForValue().set(cacheKey, list, 30, TimeUnit.MINUTES);
         return list;
     }
 
@@ -69,9 +72,8 @@ public class InspirationServiceImpl extends ServiceImpl<InspirationMapper, Inspi
         if (!db.getUserId().equals(currentUserId)) {
             throw new RuntimeException("只能删除自己的灵感");
         }
-        // 软删除
-        db.setIsDelete(1);
-        baseMapper.updateById(db);
+        // MyBatis-Plus 逻辑删除：自动将 DELETE 转为 UPDATE SET is_delete=1
+        baseMapper.deleteById(inspirationId);
         // 清除首页缓存
         redisTemplate.delete("hot:inspiration:all");
     }

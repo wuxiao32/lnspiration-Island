@@ -69,6 +69,7 @@ import { ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { ElMessage } from 'element-plus'
 import Avatar from './Avatar.vue'
+import { logout as logoutApi } from '@/api/user'
 
 const router = useRouter()
 const token = ref(localStorage.getItem('token'))
@@ -83,8 +84,9 @@ window.addEventListener('storage', () => {
   username.value = localStorage.getItem('username') || '用户'
 })
 
-const handleCommand = (cmd) => {
+const handleCommand = async (cmd) => {
   if (cmd === 'logout') {
+    try { await logoutApi() } catch {}  // 调后端删 Redis key
     localStorage.removeItem('token')
     localStorage.removeItem('username')
     localStorage.removeItem('userId')

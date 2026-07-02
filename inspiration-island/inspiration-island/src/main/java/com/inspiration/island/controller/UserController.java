@@ -3,7 +3,9 @@ package com.inspiration.island.controller;
 import com.inspiration.island.common.Result;
 import com.inspiration.island.entity.User;
 import com.inspiration.island.service.UserService;
+import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Map;
@@ -14,6 +16,9 @@ public class UserController {
 
     @Autowired
     private UserService userService;
+
+    @Autowired
+    private RedisTemplate<String, Object> redisTemplate;
 
     /** 注册 */
     @PostMapping("/register")
@@ -35,6 +40,14 @@ public class UserController {
         } catch (RuntimeException e) {
             return Result.error(400, e.getMessage());
         }
+    }
+
+    /** 退出登录（需登录） */
+    @PostMapping("/logout")
+    public Result<?> logout(HttpServletRequest request) {
+        Long userId = (Long) request.getAttribute("userId");
+        redisTemplate.delete("user:login:" + userId);
+        return Result.success("已退出登录");
     }
 
     /** 用户主页（公开） */

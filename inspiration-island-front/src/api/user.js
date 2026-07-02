@@ -4,5 +4,7 @@ import request from '@/utils/request'
 export const register = data => request.post('/user/register', data)
 // 登录
 export const login = data => request.post('/user/login', data)
+// 退出登录
+export const logout = () => request.post('/user/logout')
 // 用户主页
 export const getUserProfile = id => request.get(`/user/profile/${id}`)
