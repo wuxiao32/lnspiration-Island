@@ -21,6 +21,10 @@ public class JwtInterceptor implements HandlerInterceptor {
 
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
+        // 放行 OPTIONS 预检请求（浏览器跨域时会先发 OPTIONS，不带 token）
+        if ("OPTIONS".equalsIgnoreCase(request.getMethod())) {
+            return true;
+        }
         // 放行登录、注册
         String uri = request.getRequestURI();
         if (uri.contains("/user/login") || uri.contains("/user/register")) {
